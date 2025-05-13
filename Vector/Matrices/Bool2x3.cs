@@ -16,55 +16,48 @@ using Prowl.Vector;
 
 namespace Prowl.Vector
 {
-    /// <summary>A 4x4 matrix of bools.</summary>
+    /// <summary>A 2x3 matrix of bools.</summary>
     [System.Serializable]
-    public partial struct Bool4x4 : System.IEquatable<Bool4x4>, IFormattable
+    public partial struct Bool2x3 : System.IEquatable<Bool2x3>, IFormattable
     {
         /// <summary>Column 0 of the matrix.</summary>
-        public Bool4 c0;
+        public Bool2 c0;
         /// <summary>Column 1 of the matrix.</summary>
-        public Bool4 c1;
+        public Bool2 c1;
         /// <summary>Column 2 of the matrix.</summary>
-        public Bool4 c2;
-        /// <summary>Column 3 of the matrix.</summary>
-        public Bool4 c3;
+        public Bool2 c2;
 
-        /// <summary>Bool4x4 identity transform.</summary>
-        public static readonly Bool4x4 Identity = new Bool4x4(new Bool4(true, false, false, false), new Bool4(false, true, false, false), new Bool4(false, false, true, false), new Bool4(false, false, false, true));
+        /// <summary>Bool2x3 zero value.</summary>
+        public static readonly Bool2x3 Zero = new Bool2x3(new Bool2(false), new Bool2(false), new Bool2(false));
 
-        /// <summary>Bool4x4 zero value.</summary>
-        public static readonly Bool4x4 Zero = new Bool4x4(new Bool4(false), new Bool4(false), new Bool4(false), new Bool4(false));
-
-        /// <summary>Constructs a Bool4x4 matrix from 4 Bool4 vectors.</summary>
+        /// <summary>Constructs a Bool2x3 matrix from 3 Bool2 vectors.</summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Bool4x4(Bool4 col0, Bool4 col1, Bool4 col2, Bool4 col3)
+        public Bool2x3(Bool2 col0, Bool2 col1, Bool2 col2)
         {
             this.c0 = col0;
             this.c1 = col1;
             this.c2 = col2;
-            this.c3 = col3;
         }
 
-        /// <summary>Constructs a Bool4x4 matrix from 16 bool values given in row-major order.</summary>
+        /// <summary>Constructs a Bool2x3 matrix from 6 bool values given in row-major order.</summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Bool4x4(bool m00, bool m01, bool m02, bool m03, bool m10, bool m11, bool m12, bool m13, bool m20, bool m21, bool m22, bool m23, bool m30, bool m31, bool m32, bool m33)
+        public Bool2x3(bool m00, bool m01, bool m02, bool m10, bool m11, bool m12)
         {
-            this.c0 = new Bool4(m00, m10, m20, m30);
-            this.c1 = new Bool4(m01, m11, m21, m31);
-            this.c2 = new Bool4(m02, m12, m22, m32);
-            this.c3 = new Bool4(m03, m13, m23, m33);
+            this.c0 = new Bool2(m00, m10);
+            this.c1 = new Bool2(m01, m11);
+            this.c2 = new Bool2(m02, m12);
         }
 
-        /// <summary>Returns a reference to the Bool4 (column) at a specified index.</summary>
-        unsafe public ref Bool4 this[int index]
+        /// <summary>Returns a reference to the Bool2 (column) at a specified index.</summary>
+        unsafe public ref Bool2 this[int index]
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
             {
-                if ((uint)index >= 4)
-                    throw new System.ArgumentOutOfRangeException(nameof(index), $"Column index must be between 0 and 3, but was {index}.");
+                if ((uint)index >= 3)
+                    throw new System.ArgumentOutOfRangeException(nameof(index), $"Column index must be between 0 and 2, but was {index}.");
 
-                fixed (Bool4* pC0 = &this.c0)
+                fixed (Bool2* pC0 = &this.c0)
                 {
                     return ref pC0[index];
                 }
@@ -77,14 +70,14 @@ namespace Prowl.Vector
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
             {
-                if ((uint)column >= 4)
+                if ((uint)column >= 3)
                     throw new System.ArgumentOutOfRangeException(nameof(column));
                 return this[column][row];
             }
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             set
             {
-                if ((uint)column >= 4)
+                if ((uint)column >= 3)
                     throw new System.ArgumentOutOfRangeException(nameof(column));
                 var temp = this[column];
                 temp[row] = value;
@@ -92,9 +85,9 @@ namespace Prowl.Vector
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Equals(Bool4x4 rhs) { return this.c0.Equals(rhs.c0) && this.c1.Equals(rhs.c1) && this.c2.Equals(rhs.c2) && this.c3.Equals(rhs.c3); }
+        public bool Equals(Bool2x3 rhs) { return this.c0.Equals(rhs.c0) && this.c1.Equals(rhs.c1) && this.c2.Equals(rhs.c2); }
 
-        public override bool Equals(object o) { return o is Bool4x4 converted && Equals(converted); }
+        public override bool Equals(object o) { return o is Bool2x3 converted && Equals(converted); }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override int GetHashCode()
@@ -105,7 +98,6 @@ namespace Prowl.Vector
                 hash = hash * 23 + c0.GetHashCode();
                 hash = hash * 23 + c1.GetHashCode();
                 hash = hash * 23 + c2.GetHashCode();
-                hash = hash * 23 + c3.GetHashCode();
                 return hash;
             }
         }
@@ -120,14 +112,12 @@ namespace Prowl.Vector
         public string ToString(string format, IFormatProvider formatProvider)
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append("Bool4x4(");
+            sb.Append("Bool2x3(");
             sb.Append(this.c0.X.ToString(formatProvider));
             sb.Append(", ");
             sb.Append(this.c1.X.ToString(formatProvider));
             sb.Append(", ");
             sb.Append(this.c2.X.ToString(formatProvider));
-            sb.Append(", ");
-            sb.Append(this.c3.X.ToString(formatProvider));
             sb.Append(", ");
             sb.Append("  ");
             sb.Append(this.c0.Y.ToString(formatProvider));
@@ -135,26 +125,6 @@ namespace Prowl.Vector
             sb.Append(this.c1.Y.ToString(formatProvider));
             sb.Append(", ");
             sb.Append(this.c2.Y.ToString(formatProvider));
-            sb.Append(", ");
-            sb.Append(this.c3.Y.ToString(formatProvider));
-            sb.Append(", ");
-            sb.Append("  ");
-            sb.Append(this.c0.Z.ToString(formatProvider));
-            sb.Append(", ");
-            sb.Append(this.c1.Z.ToString(formatProvider));
-            sb.Append(", ");
-            sb.Append(this.c2.Z.ToString(formatProvider));
-            sb.Append(", ");
-            sb.Append(this.c3.Z.ToString(formatProvider));
-            sb.Append(", ");
-            sb.Append("  ");
-            sb.Append(this.c0.W.ToString(formatProvider));
-            sb.Append(", ");
-            sb.Append(this.c1.W.ToString(formatProvider));
-            sb.Append(", ");
-            sb.Append(this.c2.W.ToString(formatProvider));
-            sb.Append(", ");
-            sb.Append(this.c3.W.ToString(formatProvider));
             sb.Append(")");
             return sb.ToString();
         }
